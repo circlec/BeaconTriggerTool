@@ -1,7 +1,6 @@
 package com.zc.blescandemo;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,8 +24,9 @@ public class TriggerManager {
     private HashMap<String, Long> notifiedBeacons = new HashMap<>();
     // 未扫描到的beacon集合 key--uuid-major-minor值 未扫描到的次数 次数达到n次将存储的通知beacon移除
     private HashMap<String, Integer> noScanBeacons = new HashMap<>();
+    // 记录上次触发的是哪个beacon
     private String lasteTriggerKey;
-
+    //筛选出配置了触发的并且扫描到的beacon列表
     private ArrayList<Beacon> usefulBeacons = new ArrayList<>();
 
     private TriggerManager() {
@@ -93,7 +93,7 @@ public class TriggerManager {
                         beaconsWithDistance.remove(entry.getKey());
                     // 判定离开
                     if (notifiedBeacons.containsKey(entry.getKey())) {
-                        Log.i(TAG, "3次未扫描到  remove === " + entry.getKey());
+//                        Log.i(TAG, "3次未扫描到  remove === " + entry.getKey());
                         notifiedBeacons.remove(entry.getKey());
                     }
                 }
@@ -115,17 +115,17 @@ public class TriggerManager {
         //如果需要返回beaconData中的数据 可以再遍历取出
         if (TextUtils.isEmpty(tempKey)) return;
         if (!notifiedBeacons.containsKey(tempKey)) {//没有触发过
-            Log.i(TAG, " 没有触发过 triggerBeacon: 满足触发条件且距离最近的key = " + tempKey);
+//            Log.i(TAG, " 没有触发过 triggerBeacon: 满足触发条件且距离最近的key = " + tempKey);
             notifiedBeacons.put(tempKey, System.currentTimeMillis());
             lasteTriggerKey = tempKey;
         } else if (System.currentTimeMillis() - notifiedBeacons.get(tempKey) >= triggerDelayTime) {
             if (TextUtils.isEmpty(lasteTriggerKey) || !lasteTriggerKey.equals(tempKey)) {
-                Log.i(TAG, "触发过且触发过其他的一段时间后 triggerBeacon: 满足触发条件且距离最近的key = " + tempKey);
+//                Log.i(TAG, "触发过且触发过其他的一段时间后 triggerBeacon: 满足触发条件且距离最近的key = " + tempKey);
                 notifiedBeacons.put(tempKey, System.currentTimeMillis());
             }
         }
-        Log.i(TAG, "triggerBeacon: notifyedbeacons.size = " + notifiedBeacons.size());
-        Log.i(TAG, "triggerBeacon: -------------------------------------------------");
+//        Log.i(TAG, "triggerBeacon: notifyedbeacons.size = " + notifiedBeacons.size());
+//        Log.i(TAG, "triggerBeacon: -------------------------------------------------");
     }
 
     private void setAvgDistance() {
@@ -151,7 +151,7 @@ public class TriggerManager {
                     double avgDistance = totalDistance / triggerThreshold;
                     beaconsWithAvgDistance.put(distanceKey, avgDistance);
                 } else if (count == 0 && beaconsWithAvgDistance.containsKey(distanceKey)) {//离开
-                    Log.i(TAG, "getTriggerBeacon: 三次满足离开条件");
+//                    Log.i(TAG, "getTriggerBeacon: 三次满足离开条件");
                     it.remove();
                     beaconsWithAvgDistance.remove(distanceKey);
                     if (notifiedBeacons.containsKey(distanceKey))
