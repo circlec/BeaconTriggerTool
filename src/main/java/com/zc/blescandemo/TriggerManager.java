@@ -130,12 +130,14 @@ public class TriggerManager {
 
     private void setAvgDistance() {
         if (beaconsWithDistance.size() > 0) {
-            for (Map.Entry<String, ArrayList<Double>> entry : beaconsWithDistance.entrySet()) {
+            Iterator<Map.Entry<String, ArrayList<Double>>> it = beaconsWithDistance.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, ArrayList<Double>> entry = it.next();
                 String distanceKey = entry.getKey();
                 ArrayList<Double> distances = entry.getValue();
+                int count = 0;//标记满足条件次数
+                double totalDistance = 0;
                 for (BeaconData beaconData : beaconDatas) {
-                    int count = 0;//标记满足条件次数
-                    double totalDistance = 0;
                     for (Double distance : distances) {
                         String tempKey = beaconData.getUuid().toUpperCase() + "-" + beaconData.getMajor() + "-" + beaconData.getMinor();
                         if (distanceKey.equals(tempKey)
@@ -144,17 +146,16 @@ public class TriggerManager {
                             totalDistance += distance;
                         }
                     }
-                    if (count == triggerThreshold) { //满足进入条件 要判断是否进入 还需要比较最近的
-                        double avgDistance = totalDistance / triggerThreshold;
-                        beaconsWithAvgDistance.put(distanceKey, avgDistance);
-                    } else if (count == 0 && beaconsWithAvgDistance.containsKey(distanceKey)) {//离开
-                        Log.i(TAG, "getTriggerBeacon: 三次满足离开条件");
-                        beaconsWithAvgDistance.remove(distanceKey);
-                        if (beaconsWithDistance.containsKey(distanceKey))
-                            beaconsWithDistance.remove(distanceKey);
-                        if (notifiedBeacons.containsKey(distanceKey))
-                            notifiedBeacons.remove(distanceKey);
-                    }
+                }
+                if (count == triggerThreshold) { //满足进入条件 要判断是否进入 还需要比较最近的
+                    double avgDistance = totalDistance / triggerThreshold;
+                    beaconsWithAvgDistance.put(distanceKey, avgDistance);
+                } else if (count == 0 && beaconsWithAvgDistance.containsKey(distanceKey)) {//离开
+                    Log.i(TAG, "getTriggerBeacon: 三次满足离开条件");
+                    it.remove();
+                    beaconsWithAvgDistance.remove(distanceKey);
+                    if (notifiedBeacons.containsKey(distanceKey))
+                        notifiedBeacons.remove(distanceKey);
                 }
             }
         } else {

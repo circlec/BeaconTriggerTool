@@ -22,19 +22,27 @@ public class MainActivity extends AppCompatActivity {
         beaconData.setMinor("6669");
         beaconData.setTriggerDistance("1.8");
         beaconDatas.add(beaconData);
+        final BeaconData beaconData1 = new BeaconData();
+        beaconData1.setUuid("B5B182C7-EAB1-4988-AA99-B5C1517008D9");
+        beaconData1.setMajor("779");
+        beaconData1.setMinor("6668");
+        beaconData1.setTriggerDistance("1.8");
+        beaconDatas.add(beaconData1);
         TriggerManager.getInstance().setBeaconDatas(beaconDatas);
 
         bleScanUtils = new BleScanUtils(this);
         bleScanUtils.setUuid("B5B182C7-EAB1-4988-AA99-B5C1517008D9");
         bleScanUtils.setMajor(779);
-        bleScanUtils.setMinor(6669);
+//        bleScanUtils.setMinor(6669);
         bleScanUtils.startBleScan();
         bleScanUtils.setScanListener(new BleScanUtils.ScanListener() {
             @Override
             public void onScanListenre(ArrayList<Beacon> beacons) {
-                if (beacons.size() > 0){
-                    Log.i("TriggerManager", "nScanListenre: beacons.distance = " + beacons.get(0).getDistance());
-                    Log.i("TriggerManager", "nScanListenre: beacons.rssi = " + beacons.get(0).getRssi());
+                if (beacons.size() > 0) {
+                    for (Beacon beacon : beacons) {
+                        Log.i("TriggerManager", "nScanListenre: beacons.distance = " + beacon.getDistance());
+                        Log.i("TriggerManager", "nScanListenre: beacons.rssi = " + beacon.getRssi());
+                    }
                 }
                 TriggerManager.getInstance().getTriggerBeacon(beacons);
             }
