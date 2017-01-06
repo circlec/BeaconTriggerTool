@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("TriggerManager", "nScanListenre: beacons.distance = " + beacons.get(0).getDistance());
                     Log.i("TriggerManager", "nScanListenre: beacons.rssi = " + beacons.get(0).getRssi());
                 }
-
                 TriggerManager.getInstance().getTriggerBeacon(beacons);
             }
 

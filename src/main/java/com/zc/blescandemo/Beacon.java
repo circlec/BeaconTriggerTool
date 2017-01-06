@@ -35,8 +35,8 @@ public class Beacon implements Parcelable {
         if (ratio < 1.0) {
             return Math.pow(ratio, 10);
         } else {
-            double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-//            double accuracy = (0.42093) * Math.pow(ratio, 6.9476) + 0.54992;
+//            double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+            double accuracy = (0.42093) * Math.pow(ratio, 6.9476) + 0.54992;
             return accuracy;
         }
     }

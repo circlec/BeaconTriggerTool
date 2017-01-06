@@ -19,11 +19,10 @@ import java.util.Map;
 public class BleScanUtils {
     private static final String TAG = BleScanUtils.class.getSimpleName();
     private static final long DELEYTIME = 10 * 1000;
-    private long scanPeriod = 1000;
+    private long scanPeriod = 3000;
     private long beforeTime;
     private BluetoothAdapter mBluetoothAdapter;
     private ArrayList<Beacon> beacons = new ArrayList<>();
-    private HashMap<String, Integer> beaconsWithRssi = new HashMap<>();
     private HashMap<Beacon, Long> beaconsWithTime = new HashMap<>();
     private String uuid;
     private Integer major;
@@ -46,13 +45,11 @@ public class BleScanUtils {
                     scanListener.onScanListenre(beacons);
                 }
                 beacons.clear();
-                beaconsWithRssi.clear();
                 Iterator<Map.Entry<Beacon, Long>> it = beaconsWithTime.entrySet().iterator();
                 while (it.hasNext()) {
                     Map.Entry<Beacon, Long> entry = it.next();
                     if (nowTime - entry.getValue() < DELEYTIME) {
                         beacons.add(entry.getKey());
-                        beaconsWithRssi.put(entry.getKey().getMacAddress(), entry.getKey().getRssi());
                     } else {
                         it.remove();
                         //离开的beacon范围 可以在这里发送离开通知
@@ -75,24 +72,17 @@ public class BleScanUtils {
             if (minor != null && minor != -1 && minor != beacon.getMinor()) {
                 return;
             }
-            if (!beaconsWithRssi.containsKey(beacon.getMacAddress())) {//之前不在范围内 现在扫描到进入范围内
+            if (!beacons.contains(beacon)) {//之前不在范围内 现在扫描到进入范围内
                 beacons.add(beacon);
-                beaconsWithRssi.put(beacon.getMacAddress(), beacon.getRssi());
                 //进入beacon范围 可以在这里发送进入通知
                 if (scanListener != null) {
                     scanListener.onEnter(beacon);
                 }
-            } else if (beaconsWithRssi.containsKey(beacon.getMacAddress()) && beaconsWithRssi.get(beacon.getMacAddress()) < beacon.getRssi()) {
-                //之前在范围内 并且这次扫描到的rssi 大于上次扫描到的  距离更加近 记录距离近的这次
+            } else {
                 beacons.remove(beacon);
                 beacons.add(beacon);
-                int lastRssi = beaconsWithRssi.get(beacon.getMacAddress());
-                int recordRssi = (beacon.getRssi() + lastRssi) / 2;
-                beaconsWithRssi.put(beacon.getMacAddress(), recordRssi);
             }
             beaconsWithTime.put(beacon, System.currentTimeMillis());
-            //之前在范围内 并且这次扫描到的rssi 小于上次扫描的 距离更远 这个情况不做处理
-            /* 这个记录距离较近是因为需要更方便触发  如果不需要这个逻辑 可以把这个条件去除*/
         }
     };
 
